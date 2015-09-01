@@ -5,11 +5,23 @@ exports.convert = function(json) {
 		tag += ',' + i + '=' + json.tags[i]
 	}
 	for (i in json.fields) {
-		var isNumber = false;
-		if (typeof json.fields[i] === 'object' && json.fields[i].type === 'number') {
-			isNumber = true;
+		var v = json.fields[i];
+		if (typeof json.fields[i] === 'object') {
+			if (json.fields[i].type === 'int') {
+				v = v + 'i'; // interger influxdb >= 0.9.3
+			} else if (json.fields[i].type === 'float') { // float
+
+			}
+		} else { // string
+			v = "\"" + v + "\""
 		}
-		var v = !isNumber ? "\"" + json.fields[i] + "\"" : json.fields[i];
+
+		// boolean
+		if (v === true) {
+			v = 'TRUE';
+		} else if (v === false) {
+			v = 'FALSE';
+		}
 		fields += ',' + i + '=' + v
 	}
 	var r = json.measurement + tag + ' ' + fields.replace(',', '') + ' ' + json.time;
